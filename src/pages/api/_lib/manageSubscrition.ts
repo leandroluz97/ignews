@@ -1,9 +1,30 @@
+import { fauna } from "../../../services/fauna"
+import { query as q } from "faunadb"
+import { stripe } from "../../../services/stripe"
+
 export async function saveSubscription(
   subscriptionId: string,
-  customerId: string
+  customerId: string,
+  createAction = false
 ) {
   //get user from fauna with customerId (create indexes in faunaDB)
+  const userRef = await fauna.query(
+    q.Select(
+      "ref",
+      q.Get(q.Match(q.Index("user_by_stripe_customer_id"), customerId))
+    )
+  )
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+
+  const subscriptionData = {
+    id: subscription.id,
+    userId: userRef,
+    status: subscription.status,
+    price_id: subscription.items.data[0].price.id,
+  }
   //store the data subscrition in fauna
 
-  console.log("savesubscription: ", subscriptionId, customerId)
+  await fauna.query(
+    q.Create(q.Collection("subscriptions"), { data: subscriptionData })
+  )
 }
