@@ -1,7 +1,10 @@
 import React from "react"
 import { SignInButton } from "../SignInButton"
+import Link from "next/link"
 
 import styles from "./styles.module.scss"
+import { useRouter } from "next/dist/client/router"
+import { ActiveLink } from "../ActiveLink"
 
 export const Header = () => {
   return (
@@ -10,10 +13,12 @@ export const Header = () => {
         <img src='/images/logo.svg' alt='ig.news' />
 
         <nav>
-          <a href='Home' className={styles.active}>
-            Home
-          </a>
-          <a href='Home'>Posts</a>
+          <ActiveLink href='/' activeClassName={styles.active}>
+            <a>Home</a>
+          </ActiveLink>
+          <ActiveLink href='/posts' activeClassName={styles.active}>
+            <a>Posts</a>
+          </ActiveLink>
         </nav>
 
         <SignInButton />
